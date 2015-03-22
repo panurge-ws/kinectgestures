@@ -1,10 +1,6 @@
 $(document).ready(function () {
 
-    var $skeletonLogger = $('#skeletonLogger');
-    window.log = function(msg)
-    {
-        $skeletonLogger.text(msg);
-    };
+    
 
     var streamImageWidth = 640;
     var streamImageHeight = 480;
@@ -260,24 +256,28 @@ $(document).ready(function () {
 
     KinectGestures.init(sensor,{
         debug:true,
-        canvasElementID:'skeletonContainer'
+        registerPlayer:true,
+        numPlayersToRegister:1,
+        canvasElementID:'skeletonContainer',
+        log:true,
+        logElementID:'skeletonLogger',
     });
 
-    KinectGestures.on('playersTracked',function(event){
+    KinectGestures.on(KinectGestures.EventType.PlayersTracked, function(event){
         if (GAME_STATUS === 'waiting'){
-            window.log('Put your feet in the central position and say hello!');
+            KinectGestures.log('Put your feet in the central position and say hello!');
             GAME_STATUS = 'engaging';
         } 
     });
     
 
-    KinectGestures.on('wave', function(event){
+    KinectGestures.on(KinectGestures.GestureType.Wave, function(event){
         if (GAME_STATUS === 'engaging'){
             loggedPlayers++;
-            if (loggedPlayers === KinectGestures.PlayerRegister.numPlayersToRegister){
+            if (loggedPlayers === KinectGestures.options.numPlayersToRegister){
                 GAME_STATUS = 'engaged';
-                KinectGestures.PlayerRegister.registerPlayerPosition(event.data.trackingId, event.data.skeleton);
-                window.log('Engaged!');
+                KinectGestures.PlayerRegister.registerPlayerPosition(event.data.skeleton);
+                KinectGestures.log('Engaged!');
             }
         }
         /*window.log('Wave!'+JSON.stringify(eventData));
@@ -286,25 +286,30 @@ $(document).ready(function () {
         }, 500);*/
     });
 
-    KinectGestures.on('jump',function(event){});
     
-    KinectGestures.on('swipe',function(event){});
+    
+    KinectGestures.on(KinectGestures.GestureType.Swipe, function(event){});
 
-    KinectGestures.on('squat',function(event){});
+    //KinectGestures.on('squat',function(event){});
+    KinectGestures.on(KinectGestures.GestureType.SquatPosition, function(event){});
+    //KinectGestures.on(KinectGestures.GestureType.Squat, function(event){});
+
+    //KinectGestures.on(KinectGestures.GestureType.Jump, function(event){});
+    KinectGestures.on(KinectGestures.GestureType.JumpPosition, function(event){});
     
-    KinectGestures.on('playerLost',function(event){
-        window.log('playerLost!' + JSON.stringify(event.data));
+    KinectGestures.on(KinectGestures.EventType.PlayerLost, function(event){
+        KinectGestures.log('playerLost!' + JSON.stringify(event.data));
     });
 
-    KinectGestures.on('playerEngagedAgain',function(event){
-        window.log('playerEngagedAgain!' + JSON.stringify(event.data));
+    KinectGestures.on(KinectGestures.EventType.PlayerEngagedAgain, function(event){
+        KinectGestures.log('playerEngagedAgain!' + JSON.stringify(event.data));
     });
 
 
     var player1Position = null,
         player2Position = null;
 
-    KinectGestures.on('playerposition', function(event){
+    KinectGestures.on(KinectGestures.GestureType.PlayerPosition, function(event){
         if (event.data.playerNum === 1){
             player1Position = event.data.position;
         }
@@ -313,6 +318,6 @@ $(document).ready(function () {
         }
     });
 
-    window.log('Detecting players...');
+    KinectGestures.log('Detecting players...');
 
 });
