@@ -1,7 +1,7 @@
 {
   "name": "KinectGestures",
   "version": "0.0.1",
-  "description": "A library to detect gestures via Kinect (1.8.0) SDK ",
+  "description": "A library to detect gestures via Kinect (1.8.0) SDK",
   "main": "lib/kinect-gestures.js",
   "directories": {
     "test": "test"
