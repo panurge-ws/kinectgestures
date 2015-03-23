@@ -5,7 +5,7 @@
 ## HOW TO USE
 ---
 
-1) Install the Kinect SDK 1.8.0 [drivers](http://www.microsoft.com/en-us/download/details.aspx?id=40278) and [toolkit](http://www.microsoft.com/en-us/download/details.aspx?id=40276) for Kinect from Microsoft. 
+1) Install the Kinect SDK 1.8.0 [drivers](http://www.microsoft.com/en-us/download/details.aspx?id=40278) and [toolkit](http://www.microsoft.com/en-us/download/details.aspx?id=40276) from Microsoft. 
 
 2) Run the WebServer supplied within the toolkit.
 
@@ -107,8 +107,10 @@ KinectGestures.on(KinectGestures.EventType.PlayerRegister, function(event){
 ```
 
 ---
-### For a live example, please see test/app.js demo.
-
+### DEMO
+For a woking example, please see test/app.js demo.
+You can simpy clone this repo, add the whole folder inside the Content folder of the SDK toolkit.
+You will access it as [address to Kinect WebServer]/[repo folder]/test/index.html
 ---
 
 ## VERSION
