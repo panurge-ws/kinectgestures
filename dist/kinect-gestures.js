@@ -1348,9 +1348,7 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
 
         var _person = person;
         //var _checker = _person.checker;
-        
-        var _treshold = 0.2;
-
+    
         var _diffPos = 0;
 
         var _position = -1;
@@ -1370,7 +1368,7 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
                 
                 _diffPos = skeleton.position.x - initPlayerPosition.x;
 
-                if (Math.abs(_diffPos) > _treshold){
+                if (Math.abs(_diffPos) > PlayerPosition.Options.Threshold){
                     if (_diffPos < 0){
                         newPosition = -1;
                     }
@@ -1403,6 +1401,8 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
 
     // Gesture class
     PlayerPosition.inherits(KinectGestures.GestureChecker);
+
+    PlayerPosition.Options = {Threshold:0.2};
     
     function PlayerPosition(person)
     {   
@@ -1430,6 +1430,8 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
         var _checker = _person.checker;
         var _startTime = 0;
         var _concurrenciesTimeout = 600;
+
+
 
         
         this.Check = function(skeleton)
@@ -1465,13 +1467,13 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
             }
             
             // going down in 15 frames -> succed but not reset
-            else if (_index >= 1 && _index < 15 && footRightMovement[KinectGestures.Direction.Downward] === true && footLeftMovement[KinectGestures.Direction.Downward] === true){
+            else if (_index >= 1 && _index < JumpGesture.Options.WindowSize && footRightMovement[KinectGestures.Direction.Downward] === true && footLeftMovement[KinectGestures.Direction.Downward] === true){
                 this.Reset(true);
                 _concurrenciesTimeout = 400;
                 return {res:1, args:''};
             }
             else{
-                if (_index >= 15)
+                if (_index >= JumpGesture.Options.WindowSize)
                 {
                     this.Reset(true);
                 }
@@ -1488,11 +1490,8 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
 
         this.Reset = function(upper)
         {
-            //console.log('Reset',_index, upper);
-            //KinectGestures.log('jump reset: ' + _index);
             _index = 0;
             _fired = false;
-            //this.ResetConcurrencies();
         }
 
         this.SetConcurrencies = function()
@@ -1501,7 +1500,6 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
                 KinectGestures.GestureManager.gesturesInProgress[person.trackingId] = {};
             }
             KinectGestures.GestureManager.gesturesInProgress[person.trackingId]['jump'] = true;
-
         }
 
         this.ResetConcurrencies = function()
@@ -1515,13 +1513,14 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
                 delete KinectGestures.GestureManager.gesturesInProgress[person.trackingId]['jump'];
 
             }
-            //KinectGestures.log('ResetConcurrencies');
         }
 
     }
 
     // Gesture class
     JumpGesture.inherits(KinectGestures.GestureChecker);
+
+    JumpGesture.Options = {WindowSize:15};
     
     function JumpGesture(person)
     {   
@@ -1578,11 +1577,11 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
                 var feetPos = calcFeetPosition(skeleton);
                 var dif = feetPosCalib - feetPos;
                 //
-                if (_index === 0 && -dif >= JumpCalibratedGesture.Options.Treshold)
+                if (_index === 0 && -dif >= JumpCalibratedGesture.Options.Threshold)
                 {
                     _index = 1;
                 }
-                else if (_index === 1 && -dif < JumpCalibratedGesture.Options.Treshold)
+                else if (_index === 1 && -dif < JumpCalibratedGesture.Options.Threshold)
                 {   
                     _index = 2;
                     //KinectGestures.log(dif);
@@ -1604,9 +1603,9 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     // Gesture class
     JumpCalibratedGesture.inherits(KinectGestures.GestureChecker);
 
-    // Treshold: the minimum distance for we consider a jump has executed
+    // Threshold: the minimum distance for we consider a jump has executed
     // WindowSize: frame to wait before detect a new jump
-    JumpCalibratedGesture.Options = {Treshold:0.05, WindowSize:4};
+    JumpCalibratedGesture.Options = {Threshold:0.05, WindowSize:4};
     
     function JumpCalibratedGesture(person)
     {   
