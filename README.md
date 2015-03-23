@@ -5,13 +5,17 @@
 ## HOW TO USE
 ---
 
-1) Install the Kinect SDK 1.8.0 drivers for Kinect from Microsoft.1) 
+1) Install the Kinect SDK 1.8.0 [drivers](http://www.microsoft.com/en-us/download/details.aspx?id=40278) and [toolkit](http://www.microsoft.com/en-us/download/details.aspx?id=40276) for Kinect from Microsoft. 
 
-2) Add the [Kinect SDK 1.8.0](https://github.com/panurge-ws/kinectgestures/blob/master/sdk/Kinect-1.8.0.js) to your HTML
+2) Run the WebServer supplied within the toolkit.
 
-3) Add the [kinect-gestures.js](https://github.com/panurge-ws/kinectgestures/blob/master/dist/kinect-gestures.js) (or the [minified version](https://github.com/panurge-ws/kinectgestures/blob/master/dist/kinect-gestures.min.js) ) to your HTML
+3) Create a new HTML file in the Content folder of the WebServer folder in the TootlKit folder, E.g. "gestures.html": it will be available at: http://localhost:8181/files/gestures.html according to the WebServer settings.
 
-4) Start the sensor:
+4) Add the [Kinect SDK 1.8.0](https://github.com/panurge-ws/kinectgestures/blob/master/sdk/Kinect-1.8.0.js) to your HTML
+
+5) Add the [kinect-gestures.js](https://github.com/panurge-ws/kinectgestures/blob/master/dist/kinect-gestures.js) (or the [minified version](https://github.com/panurge-ws/kinectgestures/blob/master/dist/kinect-gestures.min.js) ) to your HTML
+
+6) Start the sensor:
 
 ```javascript
 var sensor = Kinect.sensor(Kinect.DEFAULT_SENSOR_NAME, function(sensorToConfig, isConnected) {
@@ -21,7 +25,7 @@ var sensor = Kinect.sensor(Kinect.DEFAULT_SENSOR_NAME, function(sensorToConfig, 
 });
 ```
         
-5) Initialize the KinectGestures library
+7) Initialize the KinectGestures library
 
 ```javascript
 KinectGestures.init(sensor,{
@@ -36,7 +40,7 @@ KinectGestures.init(sensor,{
     });
 ```
 
-6) Listen for gestures events
+8) Listen for gestures and players'status events
 
 ```javascript
 // weva the right hand
@@ -107,10 +111,10 @@ KinectGestures.on(KinectGestures.EventType.PlayerRegister, function(event){
 
 ---
 
-
-
-----------
+## VERSION
+---
 The library is currently in alpha version and it should be considered "experimental", not for using in production environments.
+
 
 ## LICENSE
 Unlicensed: see more on LICENSE file
