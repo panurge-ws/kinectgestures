@@ -2,6 +2,7 @@
 ## A JavaScript library to detect gestures via Kinect (1.8.0) SD
 
 ---
+
 ## HOW TO USE
 ---
 
@@ -106,11 +107,9 @@ KinectGestures.on(KinectGestures.EventType.PlayerRegister, function(event){
 });
 ```
 
+## DEMO
 ---
-### DEMO
-For a woking example, please see test/app.js demo.
-You can simpy clone this repo, add the whole folder inside the Content folder of the SDK toolkit. You will access it as [address to Kinect WebServer]/[repo folder]/test/index.html
----
+For a woking example, please see test/app.js demo. You can simpy clone this repo, add the whole folder inside the Content folder of the SDK toolkit. You will access it as [address to Kinect WebServer]/[repo folder]/test/index.html
 
 ## VERSION
 ---
@@ -118,11 +117,12 @@ The library is currently in alpha version and it should be considered "experimen
 
 
 ## LICENSE
+---
 Unlicensed: see more on LICENSE file
 
 
 ## CREDITS
-
+---
 Parts of the mathematical methods are ported from a C# version available at 
 https://gesturedetector.codeplex.com/SourceControl/latest#GestureDetector/
 
