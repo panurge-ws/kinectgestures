@@ -1,5 +1,4 @@
-## ** Experimental **
-## A JavaScript library to detect gestures via Kinect (1.8.0) SD
+## A JavaScript library to detect gestures via Kinect (1.8.0) SDK
 
 ---
 
