@@ -36,7 +36,7 @@ KinectGestures.init(sensor,{
     registerPlayer:true, 
     numPlayersToRegister:1, // wait n players before enable registering
     log:true, // enable logging
-    logElementID:'canvasElement', // the ID of the HTML element where the log message will write
+    logElementID:'logElement', // the ID of the HTML element where the log message will write
     });
 ```
 
