@@ -31,12 +31,16 @@ var sensor = Kinect.sensor(Kinect.DEFAULT_SENSOR_NAME, function(sensorToConfig, 
 KinectGestures.init(sensor,{
 	// enable debugging (it will draw the skeleton on a canvas element, see below)
     debug:true, 
-    canvasElementID:'canvasElement', // the ID of the canvas element where the debugger will draw the skeletons'data
+    // the ID of the canvas element where the debugger will draw the skeletons'data
+    canvasElementID:'canvasElement', 
     // enable registration for players, so you can detect which skeleton belongs to player 1 or 2 (see below)
     registerPlayer:true, 
-    numPlayersToRegister:1, // wait n players before enable registering
-    log:true, // enable logging
-    logElementID:'logElement', // the ID of the HTML element where the log message will write
+    // wait n players before enable registering
+    numPlayersToRegister:1,
+    // enable logging
+    log:true, 
+    // the ID of the HTML element where the log message will write
+    logElementID:'logElement', 
     });
 ```
 
