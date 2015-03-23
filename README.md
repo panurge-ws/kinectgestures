@@ -109,8 +109,7 @@ KinectGestures.on(KinectGestures.EventType.PlayerRegister, function(event){
 ---
 ### DEMO
 For a woking example, please see test/app.js demo.
-You can simpy clone this repo, add the whole folder inside the Content folder of the SDK toolkit.
-You will access it as [address to Kinect WebServer]/[repo folder]/test/index.html
+You can simpy clone this repo, add the whole folder inside the Content folder of the SDK toolkit. You will access it as [address to Kinect WebServer]/[repo folder]/test/index.html
 ---
 
 ## VERSION
