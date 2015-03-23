@@ -1807,7 +1807,7 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
             if (calibSkel){
                 var dif = calibSkel.joints[JointType.HipCenter].position.y - skeleton.joints[JointType.HipCenter].position.y;
                 //KinectGestures.log(dif);
-                var newPos = dif >= SquatCalibrated.Options.Treshold ? 'down' : 'up';
+                var newPos = dif >= SquatCalibrated.Options.Threshold ? 'down' : 'up';
                 if (_currPos != newPos){
                     var res = {res:1, args:{newPosition:newPos, oldPosition:_currPos}};
                     _currPos = newPos;
@@ -1821,7 +1821,7 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     SquatCalibrated.inherits(KinectGestures.GestureChecker);
 
     // the minimum distance for we consider a squat has executed
-    SquatCalibrated.Options = {Treshold:0.15};
+    SquatCalibrated.Options = {Threshold:0.15};
     
     function SquatCalibrated(person)
     {   
