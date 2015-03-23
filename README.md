@@ -1,7 +1,9 @@
 ## ** Experimental **
 ## A JavaScript library to detect gestures via Kinect (1.8.0) SD
 
-Hot to use it:
+---
+## HOW TO USE
+---
 
 1) Install the Kinect SDK 1.8.0 drivers for Kinect from Microsoft.1) 
 
@@ -100,21 +102,28 @@ KinectGestures.on(KinectGestures.EventType.PlayerRegister, function(event){
 });
 ```
 
-For a live example, plesa see test/app.js demo
+---
+### For a live example, please see test/app.js demo.
 
-
-
-
-
-    
-    
-
-
+---
 
 
 
 ----------
-The app is currently in alpha
+The library is currently in alpha version and it should be considered "experimental", not for using in production environments.
+
+## LICENSE
+Unlicensed: see more on LICENSE file
+
+
+## CREDITS
+
+Parts of the mathematical methods are ported from a C# version available at 
+https://gesturedetector.codeplex.com/SourceControl/latest#GestureDetector/
+
+Thanks to [ThinkingAbout](http://www.thinkingabout.it/) to have supported this project.
+
+
 
 
 
