@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    
+    var isSensorConnected = false;
 
     var configuration = {
 
@@ -10,14 +10,14 @@ $(document).ready(function () {
      
         "userviewer" : {
             "enabled": false,
-            "resolution": "640x480", //320x240, 160x120, 128x96, 80x60
-            "userColors": { "engaged": 0x7fffffff, "tracked": 0x7fffffff },
-            "defaultUserColor": 0x70000000, //RGBA 2147483647
+            //"resolution": "640x480", //320x240, 160x120, 128x96, 80x60
+            //"userColors": { "engaged": 0x7fffffff, "tracked": 0x7fffffff },
+            //"defaultUserColor": 0x70000000, //RGBA 2147483647
         },
      
         "backgroundRemoval" : {
             "enabled": false,
-            "resolution": "640x480", //1280x960
+            //"resolution": "640x480", //1280x960
         },
      
         "skeleton" : {
@@ -32,7 +32,24 @@ $(document).ready(function () {
 
     // Create sensor and UI adapter layers
     var sensor = Kinect.sensor(Kinect.DEFAULT_SENSOR_NAME, function (sensorToConfig, isConnected) {
+        isSensorConnected = isConnected;
         sensorToConfig.postConfig(configuration);
+        console.log('isSensorConnected',isSensorConnected);
+    });
+
+    sensor.addEventHandler(function (event) {
+                
+        switch (event.category) {
+            case Kinect.SENSORSTATUS_EVENT_CATEGORY:
+                switch (event.eventType) {
+                    case Kinect.SENSORSTATUSCHANGED_EVENT_TYPE:
+                    var connected = event.connected;
+                    isSensorConnected = event.connected;
+                    console.log('isSensorConnected',isSensorConnected);
+                        break;
+                }
+                break;
+        }
     });
     
     
@@ -72,8 +89,6 @@ $(document).ready(function () {
             window.log('');
         }, 500);*/
     });
-
-    
     
     KinectGestures.on(KinectGestures.GestureType.Swipe, function(event){});
 
