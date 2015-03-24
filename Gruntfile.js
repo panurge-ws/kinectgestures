@@ -22,6 +22,7 @@ module.exports = function(grunt) {
                 'lib/tools/checker.js',
                 'lib/tools/player-register.js',
                 'lib/tools/skeleton-math.js',
+                'lib/tools/skeleton-stability.js',
                 'lib/gestures/player-position.js',
                 'lib/gestures/jump.js',
                 'lib/gestures/wave.js',

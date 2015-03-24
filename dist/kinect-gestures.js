@@ -1,7 +1,5 @@
 // inherits utils
-Function.prototype.inherits = function(parent) {
-  this.prototype = Object.create(parent.prototype);
-};
+
 
 window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
 
@@ -152,6 +150,7 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     KinectGestures.on = KinectGestures.addEventListener;    
     KinectGestures.off = KinectGestures.removeEventListener;
 
+    
     // Logging
     var logElement = null;
     KinectGestures.log = function(msg)
@@ -165,6 +164,18 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     	}
     }
 
+
+
+    // utils // TODO move in other file
+    KinectGestures.Utils = {}
+
+    KinectGestures.Utils.Inherits = function(functionExtending, superFunction){
+    	functionExtending.prototype = Object.create(superFunction.prototype);
+    }
+
+    /*Function.prototype.inherits = function(parent) {
+	  this.prototype = Object.create(parent.prototype);
+	};*/
 
 })();
 window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
@@ -1284,6 +1295,223 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
 })();
 
 window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
+
+// Stability helper
+// it detects if the skeleton is "well-formed"
+
+(function(){
+
+
+    function SkeletonStability(){}
+
+    // Detects id a skeleton is well formed
+    // checking the correct dispositions of the joints
+    // @checker the cheker of the person
+    // @skeleton A skeleton data frame 
+    // @skeletonPart: null | 'upper' | 'lower' if null check the whole skeleton (upper and lower part)
+    // @checkDirections: if tru check also the direcitons of the joints, not only the tracking status
+    // @position: null | 'standing' (the skeleton is standing up)
+    // TODO
+    // @duration: the lapse of frames in which well formed has to be checked
+    // return true or false 
+
+    SkeletonStability.isWellFormed = function(checker, skeleton, skeletonPart, checkDirections, position, duration)
+    {
+        var resUpper = true, resLower = true;
+
+        if (skeletonPart)
+        {
+            if (skeletonPart === 'upper')
+            {
+                resUpper = checkUpperPart(checker, skeleton, checkDirections);
+            }
+            else{
+                 resLower = checkLowerPart(checker, skeleton, checkDirections, position);
+            }
+        }
+        else{
+            resUpper = checkUpperPart(checker, skeleton, checkDirections);
+            resLower = checkLowerPart(checker, skeleton, checkDirections, position);
+        }
+
+        return resUpper && resLower;
+    }
+
+    function checkLowerPart(checker, skeleton, checkDirections, position)
+    {
+        var jointsToCheck = [
+                JointType.HipCenter,
+                JointType.HipLeft,
+                JointType.HipRight,
+                JointType.KneeRight,
+                JointType.KneeLeft,
+                JointType.FootRight,
+                JointType.FootLeft,
+            ];
+
+
+        for (var i = jointsToCheck.length - 1; i >= 0; i--) {
+            if (skeleton.joints[jointsToCheck[i]].trackingState < 2){
+                return false;
+            }
+        }
+
+        if (!checkDirections){
+            return true;
+        }
+
+        var leftHipOrientation = checker.GetRelativePosition(JointType.HipCenter, JointType.HipLeft);
+
+        if (!leftHipOrientation[KinectGestures.Direction.Left])
+        {   
+            return false;
+        }
+
+        var rightHipOrientation = checker.GetRelativePosition(JointType.HipCenter, JointType.HipRight);
+
+        if (!rightHipOrientation[KinectGestures.Direction.Right])
+        {   
+            return false;
+        }
+
+        if (!position)
+        {
+            return true;
+        }
+        else if (position === 'standup'){
+            
+            var kneeHipOrientation = checker.GetRelativePosition(JointType.HipLeft, JointType.KneeLeft);
+
+            if (!kneeHipOrientation[KinectGestures.Direction.Downward])
+            {   
+                return false;
+            }
+
+            var footKneeOrientation = checker.GetRelativePosition(JointType.KneeLeft, JointType.FootLeft);
+
+            if (!footKneeOrientation[KinectGestures.Direction.Downward])
+            {   
+                return false;
+            }
+
+        }
+
+        return true;
+    }
+
+    function checkUpperPart(checker, skeleton, checkDirections)
+    {   
+        var jointsToCheck = [
+                JointType.ShoulderLeft,
+                JointType.ShoulderRight,
+                JointType.ShoulderCenter,
+                JointType.ElbowLeft,
+                JointType.ElbowRight,
+                JointType.HandRight,
+                JointType.HandLeft,
+            ];
+
+
+        for (var i = jointsToCheck.length - 1; i >= 0; i--) {
+            if (skeleton.joints[jointsToCheck[i]].trackingState < 2){
+                return false;
+            }
+        }
+
+        if (!checkDirections){
+            return true;
+        }
+
+        var leftShoulderOrientation = checker.GetRelativePosition(JointType.ShoulderCenter, JointType.ShoulderLeft);
+
+        if (!leftShoulderOrientation[KinectGestures.Direction.Left])
+        {   
+            return false;
+        }
+
+        var rightShoulderOrientation = checker.GetRelativePosition(JointType.ShoulderCenter, JointType.ShoulderRight);
+
+        if (!rightShoulderOrientation[KinectGestures.Direction.Right])
+        {   
+            return false;
+        }
+
+        var centerShoulderHipOrientation = checker.GetRelativePosition(JointType.HipCenter, JointType.ShoulderCenter);
+
+        if (!centerShoulderHipOrientation[KinectGestures.Direction.Upward])
+        {   
+
+            return false;
+        }
+
+        return true;
+
+    }
+
+    KinectGestures.SkeletonStability = SkeletonStability;
+
+
+})()
+
+/*(function(KinectGestures){
+
+    function SkeletonStability(){}
+
+    var WINDOW_SIZE = 3; // frame number for a segment is considered still active
+    var TRESHOLD_STABLE = 0.04;
+
+    var _gestureTrack = {};
+    
+    function resetGesture(trackingId)
+    {   
+        if (_gestureTrack[trackingId]){
+            _gestureTrack[trackingId] = null;
+            delete _gestureTrack[trackingId];
+        }
+        
+    }
+
+    SkeletonStability.isStable = function(trackingId)
+    {
+        if (_gestureTrack[trackingId]){
+           return _gestureTrack[trackingId].stable === true;
+        }
+        // return not stable if not mapped
+        // TODO check...
+        return false;
+    }
+    
+    SkeletonStability.update = function(skeleton){
+
+        if (!_gestureTrack[skeleton.trackingId]){
+
+            _gestureTrack[skeleton.trackingId] = {
+                lastPosition:skeleton.position,
+                stable: false,
+                frameCount:0
+            }
+        }
+        
+        if (_gestureTrack[skeleton.trackingId].frameCount >= WINDOW_SIZE){
+            
+            var dif = Math.abs(skeleton.position.x - _gestureTrack[skeleton.trackingId].lastPosition.x);
+            var stable = dif < TRESHOLD_STABLE ;
+            _gestureTrack[skeleton.trackingId].stable = stable;
+            //KinectGestures.log(stable + ' -> ' + dif.toFixed(3));
+            _gestureTrack[skeleton.trackingId].lastPosition = skeleton.position;
+
+            _gestureTrack[skeleton.trackingId].frameCount = 0;
+        }
+        else{
+            _gestureTrack[skeleton.trackingId].frameCount++;
+        }
+
+    }               
+
+    KinectGestures.SkeletonStability = SkeletonStability;
+
+})();*/
+window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
 // Detect the position of a player relative to his initial registered position
 // not a real gesture
 // but we use the same interface of a gesture to detect tht
@@ -1347,7 +1575,7 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     function PlayerPositionContition(person){
 
         var _person = person;
-        //var _checker = _person.checker;
+        var _checker = _person.checker;
     
         var _diffPos = 0;
 
@@ -1355,7 +1583,15 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
         
         this.Check = function(skeleton)
         {
-            
+            // the skeleton should be tracked, well formed on the lower part, and in stand up position
+            if (!KinectGestures.SkeletonStability.isWellFormed(_checker, skeleton,'lower')){
+                //KinectGestures.log('skeletonStability->flase');
+                return {res:0};
+            }
+            /*else{
+                KinectGestures.log('skeletonStability->true');
+            }*/
+
             if (KinectGestures.PlayerRegister.isRegistering){
                 return;
             }
@@ -1400,7 +1636,8 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     }
 
     // Gesture class
-    PlayerPosition.inherits(KinectGestures.GestureChecker);
+    //PlayerPosition.inherits(KinectGestures.GestureChecker);
+    KinectGestures.Utils.Inherits(PlayerPosition, KinectGestures.GestureChecker);
 
     PlayerPosition.Options = {Threshold:0.2};
     
@@ -1439,7 +1676,15 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
             // we have just jumped
             //KinectGestures.log(_index);
             
-            
+            // the skeleton should be tracked, well formed on the lower part, and in standing up position
+            if (!KinectGestures.SkeletonStability.isWellFormed(_checker, skeleton,'lower', true, 'standup')){
+                //KinectGestures.log('skeletonStability->flase');
+                return {res:0};
+            }
+            /*else{
+                KinectGestures.log('skeletonStability->true');
+            }*/
+
             var footRightMovement = _checker.GetSteadyAbsoluteMovement(JointType.AnkleRight, 3);
             var footLeftMovement = _checker.GetSteadyAbsoluteMovement(JointType.AnkleLeft, 3);
             var footRAbsMovoment = _checker.GetSteadyAbsoluteMovement(JointType.AnkleRight, 5);
@@ -1518,7 +1763,9 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     }
 
     // Gesture class
-    JumpGesture.inherits(KinectGestures.GestureChecker);
+    //JumpGesture.inherits(KinectGestures.GestureChecker);
+    KinectGestures.Utils.Inherits(JumpGesture, KinectGestures.GestureChecker);
+
 
     JumpGesture.Options = {WindowSize:15};
     
@@ -1559,6 +1806,13 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
         }
         this.Check = function(skeleton)
         {
+            // the skeleton should be tracked, well formed on the lower part, and in standing up position
+            if (!KinectGestures.SkeletonStability.isWellFormed(_checker, skeleton,'lower', true, 'standup')){
+                //KinectGestures.log('skeletonStability->flase');
+                return {res:0};
+            }
+
+
             var hipAbsMovoment = _checker.GetSteadyAbsoluteMovement(JointType.HipCenter, 5);
             // body steady in last 5 frames
             if (_index === 0 && 
@@ -1601,7 +1855,8 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     }
 
     // Gesture class
-    JumpCalibratedGesture.inherits(KinectGestures.GestureChecker);
+    //JumpCalibratedGesture.inherits(KinectGestures.GestureChecker);
+    KinectGestures.Utils.Inherits(JumpCalibratedGesture, KinectGestures.GestureChecker);
 
     // Threshold: the minimum distance for we consider a jump has executed
     // WindowSize: frame to wait before detect a new jump
@@ -1639,6 +1894,13 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
         this.Check = function(skeleton)
         {
             
+            if (!KinectGestures.SkeletonStability.isWellFormed(_checker, skeleton,'upper')){
+                //KinectGestures.log('skeletonStability->flase');
+                return {res:0};
+            }
+            //else{
+                //KinectGestures.log('skeletonStability->true');
+            //}
             // Hand above elbow
             if (skeleton.joints[JointType.HandRight].position.y < 
                 skeleton.joints[JointType.ElbowRight].position.y)
@@ -1682,7 +1944,9 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     }
 
     // Gesture class
-    WaveGesture.inherits(KinectGestures.GestureChecker);
+    //WaveGesture.inherits(KinectGestures.GestureChecker);
+
+    KinectGestures.Utils.Inherits(WaveGesture, KinectGestures.GestureChecker);
     
     function WaveGesture(person)
     {   
@@ -1713,7 +1977,12 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
 
         this.Check = function(skeleton)
         {
-               
+             
+            // the skeleton should be tracked, well formed on the lower part, and in standing up position
+            if (!KinectGestures.SkeletonStability.isWellFormed(_checker, skeleton,'lower', true, 'standup')){
+                //KinectGestures.log('skeletonStability->flase');
+                return {res:0};
+            }  
             var hipVelocity = _checker.GetAbsoluteVelocity(JointType.HipCenter);
             
             // if jump is in progress rreset 
@@ -1771,7 +2040,8 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     }
 
     // Gesture class
-    SquatGesture.inherits(KinectGestures.GestureChecker);
+    //SquatGesture.inherits(KinectGestures.GestureChecker);
+    KinectGestures.Utils.Inherits(SquatGesture, KinectGestures.GestureChecker);
     
     function SquatGesture(person)
     {   
@@ -1797,11 +2067,18 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     function SquatCalibratedCondition(person, params){
 
         var _person = person;
+        var _checker = _person.checker;
         var _currPos = '';
         
         
         this.Check = function(skeleton)
-        {
+        {   
+            // the skeleton should be tracked, well formed on the lower part
+            if (!KinectGestures.SkeletonStability.isWellFormed(_checker, skeleton, 'lower')){
+                //KinectGestures.log('skeletonStability->flase');
+                return {res:0};
+            }
+
             var calibSkel = KinectGestures.PlayerRegister.getRefSkeletonById(skeleton.trackingId);
             if (calibSkel){
                 var dif = calibSkel.joints[JointType.HipCenter].position.y - skeleton.joints[JointType.HipCenter].position.y;
@@ -1817,7 +2094,9 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     }
 
     // Gesture class
-    SquatCalibrated.inherits(KinectGestures.GestureChecker);
+    //SquatCalibrated.inherits(KinectGestures.GestureChecker);
+    KinectGestures.Utils.Inherits(SquatCalibrated, KinectGestures.GestureChecker);
+
 
     // the minimum distance for we consider a squat has executed
     SquatCalibrated.Options = {Threshold:0.15};
@@ -1877,6 +2156,11 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
         this.Check = function(skeleton)
         {
             
+            if (!KinectGestures.SkeletonStability.isWellFormed(_checker, skeleton,'upper')){
+                //KinectGestures.log('skeletonStability->flase');
+                return {res:0};
+            }
+
             var handToHipOrientation = _checker.GetRelativePosition(JointType.HipCenter, _hand);
             var handToShoulderOrientation = _checker.GetRelativePosition(JointType.ShoulderCenter, _hand);
             var handMovement = _checker.GetAbsoluteMovement(_hand);
@@ -1950,7 +2234,8 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
 
 
     // Gesture class
-    SwipeGesture.inherits(KinectGestures.GestureChecker);
+    //SwipeGesture.inherits(KinectGestures.GestureChecker);
+    KinectGestures.Utils.Inherits(SwipeGesture, KinectGestures.GestureChecker);
 
     SwipeGesture.Options = {Hand:JointType.HandRight, AllowedDirections:[KinectGestures.Direction.Left, KinectGestures.Direction.Right]};
 
@@ -2024,13 +2309,15 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
     }
 
     // Gesture class
-    JoystickGesture.inherits(KinectGestures.GestureChecker);
+    //JoystickGesture.inherits(KinectGestures.GestureChecker);
+    KinectGestures.Utils.Inherits(JoystickGesture, KinectGestures.GestureChecker);
+
     
     function JoystickGesture(person)
     {   
         KinectGestures.GestureChecker.apply(this, arguments);
 
-        this.gestureName = 'Joystic';
+        this.gestureName = KinectGestures.GestureType.Joystick;
         this.person = person;
         this.timeout = 5000;
         this.conditions = [ new JoystickCondition( person, false )];
