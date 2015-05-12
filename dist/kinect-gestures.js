@@ -36,6 +36,7 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
 		'PlayerEngagedAgain':'playerEngagedAgain',
 		'PlayerLost':'playerLost',
 		'PlayersTracked':'playersTracked',
+		'PlayerTracked':'playerTracked',
 		'PlayerRegister':'playerRegister',
 	};
 
@@ -117,13 +118,25 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
 
 	KinectGestures.enable = function()
 	{
-		_sensor.addStreamFrameHandler( onStreamFrame );
+		if (_sensor){
+			_sensor.addStreamFrameHandler( onStreamFrame );
+			_sensor.connect();
+		}
+		
 	};
 
 	KinectGestures.disable = function()
 	{
-		_sensor.removeStreamFrameHandler( onStreamFrame );
-	}
+		if (_sensor){
+			_sensor.removeStreamFrameHandler( onStreamFrame );
+			_sensor.disconnect();
+		}
+	};
+
+	KinectGestures.toggleDebugMode = function()
+	{
+		KinectGestures.options.debug = !KinectGestures.options.debug;
+	};
 
 	// events emitter / listener
     KinectGestures.emitter = document.createElement('div');
@@ -359,7 +372,7 @@ window.JointType = window.KinectGestures.JointType = {
             {
               for (var i = currentlyTrackedPlayers.length - 1; i >= 0; i--) {
                 var player = KinectGestures.PlayerRegister.getPlayerById(currentlyTrackedPlayers[i].trackingId);
-                KinectGestures.emit(KinectGestures.EventType.PlayerLost, {trackingId:currentlyTrackedPlayers[i].trackingId, playerNum:player ? player.playerNum : -1});
+                KinectGestures.emit(KinectGestures.EventType.PlayerLost, {trackingId:currentlyTrackedPlayers[i].trackingId, playerNum:player ? player.playerNum : -1, relativePosition:currentlyTrackedPlayers[i].position.x <= 0 ? 1 : 2});
               }
             }
             else{ 
@@ -381,7 +394,7 @@ window.JointType = window.KinectGestures.JointType = {
 
               for (i = losts.length - 1; i >= 0; i--) {
                 var player = KinectGestures.PlayerRegister.getPlayerById(losts[i].trackingId);
-                KinectGestures.emit(KinectGestures.EventType.PlayerLost, {trackingId:losts[i].trackingId, playerNum:player ? player.playerNum : -1});
+                KinectGestures.emit(KinectGestures.EventType.PlayerLost, {trackingId:losts[i].trackingId, playerNum:player ? player.playerNum : -1, relativePosition:losts[i].position.x <= 0 ? 1 : 2});
               }
             } 
         }
@@ -937,6 +950,10 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
                         PlayerRegister.initPositionPlayer2 = skeleton.position;
                         PlayerRegister.initPositionPlayer2.trackingId = skeleton.trackingId;
                     }*/
+                    if (!PlayerRegister.isCalibrating)
+                    {
+                        KinectGestures.emit(KinectGestures.EventType.PlayerTracked, {relativePosition:skeleton.position.x <= 0 ? 1 : 2, skeleton:skeleton});
+                    }
                    
                 }
             }
@@ -945,6 +962,7 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
                 PlayerRegister.isCalibrating = true;
                 KinectGestures.emit(KinectGestures.EventType.PlayersTracked);
             }
+            
         }
 
     } 
@@ -2341,7 +2359,7 @@ window.KinectGestures = window.KinectGestures ? window.KinectGestures : {};
             context = null;
 
         var record = false;
-        var skeletonColors = ['#ff0000','#ff00ff','#ffff00','#0000ff','#fff000','#000fff'];
+        var skeletonColors = ['#ff0000','#ff00ff','#ffff00','#0000ff','#fff000','#000fff','#ff0000','#ff00ff'];
 
         function onResize()
         {

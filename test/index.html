@@ -64,6 +64,11 @@
             -webkit-transform: translate3d(-50%,-50%,0);
 
         }
+        #ui{
+            position:absolute;
+            top:0;
+            z-index: 10001;
+        }
     </style>
     
 </head>
@@ -73,5 +78,10 @@
     <canvas id="skeletonContainer"></canvas>
     <script type="text/javascript" src="app.js"></script>
 
+    <div id="ui">
+        <button onclick="enableSensor()">Enable sensor</button><br>
+        <button onclick="disableSensor()">Disable sensor</button>
+    </div>
+    
 </body>
 </html>
