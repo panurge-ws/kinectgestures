@@ -97,7 +97,8 @@ $(document).ready(function () {
     //KinectGestures.on(KinectGestures.GestureType.Squat, function(event){});
 
     //KinectGestures.on(KinectGestures.GestureType.Jump, function(event){});
-    KinectGestures.on(KinectGestures.GestureType.JumpPosition, function(event){});
+    //KinectGestures.on(KinectGestures.GestureType.JumpPosition, function(event){});
+    KinectGestures.on(KinectGestures.GestureType.JumpPositionHip, function(event){});
     
     KinectGestures.on(KinectGestures.EventType.PlayerLost, function(event){
         KinectGestures.log('playerLost!' + JSON.stringify(event.data));
